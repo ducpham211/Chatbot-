@@ -10,22 +10,65 @@ font-family: "Inter", sans-serif;
 }
 
 body{
-    display: flex;
-    justify-content: center;
-    align-items : center;
     min-height: 100vh;
     background : linear-gradient(#EEEEFF, #C8C7FF);
 }
 
+#chatbot-toggler{
+    position:fixed;
+    bottom: 30px;
+    right: 35px;
+    border:none;
+    height: 50px;
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius:50%;
+    background: #5350C4;
+    transition: all 0.2s ease;
+}
+
+body.show-chatbot #chatbot-toggler {
+    transform: rotate(90deg);
+}
+
+#chatbot-toggler span{
+    color: #fff;
+    position:absolute;
+}
+body.show-chatbot #chatbot-toggler span:first-child,
+#chatbot-toggler span:last-child {
+    opacity : 0;
+}
+
+body.show-chatbot #chatbot-toggler span:last-child {
+    opacity:1;
+}
+
 .chatbot-popup{
-    position: relative;
+    position: fixed;
+    right: 35px;
+    bottom: 90px;
     width: 420px;
     background: #fff;
     overflow : hidden;
     border-radius: 15px;
+    opacity: 0;
+    transform: scale(0.2);
+    transform-origin: bottom right;
+    pointer-events: none;
     box-shadow : 0 0 128px 0 rgba(0, 0, 0, 0.1),
     0 32px 64px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.1s ease;
+    margin-right: 500px;
+}
 
+body.show-chatbot .chatbot-popup{
+    opacity :1;
+    pointer-events: auto;
+    transform: scale(1);
 }
 
 .chat-header{
@@ -84,6 +127,8 @@ body{
     height: 460px;
     margin-bottom: 82px;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #CCCCF5 transparent;
 }
 
 .chat-body .message{
@@ -127,6 +172,12 @@ body{
 .chat-body .user-message{
     flex-direction: column;
     align-items: flex-end;
+}
+
+.chat-body .user-message .attachment{
+    width: 50%;
+    margin-top: -7px;
+    border-radius: 13px 3px 13px 13px;
 }
 
 .chat-body .bot-message .thinking-indicator{
@@ -182,6 +233,7 @@ body{
 
 .chat-footer .chat-form{
     display: flex;
+    position: relative;
     align-items: center;
     background: #fff;
     border-radius:  32px;
@@ -194,9 +246,16 @@ body{
     height : 47px;
     width : 100%;
     resize: none;
+    max-height: 180px;
+    white-space: pre-line;
     font-size: 0.95rem;
     padding : 14px 0px 0px 20px;
     border-radius : inherit;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+.chat-form .message-input:hover{
+     scrollbar-color: #CCCCF5 transparent;
 }
 
 .chat-form .chat-controls{
@@ -249,3 +308,110 @@ body{
     outline: 2px solid #4A4AFF;
 } 
 
+/* APPROACH 2: Mở rộng wrapper để chứa cả hai nút */
+
+.chat-form .file-upload-wrapper {
+    height: 35px;
+    width: auto; /* Thay đổi từ 35px */
+    position: relative;
+    display: flex;
+    gap: 3px;
+}
+
+.chat-form .file-upload-wrapper img {
+    display: none;
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.chat-form .file-upload-wrapper #file-upload,
+.chat-form .file-upload-wrapper #file-cancel {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.chat-form .file-upload-wrapper #file-cancel {
+    display: none;
+    color: #ff0000;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ff0000;
+}
+
+.chat-form .file-upload-wrapper #file-cancel:hover {
+    background: #ff0000;
+    color: #fff;
+}
+
+/* Khi đã upload file: hiện img và nút cancel */
+.chat-form .file-upload-wrapper.file-uploaded img,
+.chat-form .file-upload-wrapper.file-uploaded #file-cancel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Khi có file, làm mờ background của nút upload để img nổi bật */
+.chat-form .file-upload-wrapper.file-uploaded #file-upload {
+    background: rgba(241, 241, 255, 0.5);
+}
+
+em-emoji-picker {
+    position: absolute;
+    left: 50%;
+    bottom: 100%; /* Thay đổi từ top: -337px */
+    margin-bottom: 10px; /* Khoảng cách từ form */
+    width: 100%;
+    max-width: 350px;
+    max-height: 330px;
+    transform: translateX(-50%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Khi hiển thị emoji picker */
+body.show-emoji-picker em-emoji-picker {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (max-width: 520px){
+    #chatbot-toggler {
+        right: 20px;
+        bottom: 20px;
+    }
+
+    .chatbot-popup {
+        right: 0;
+        bottom: 0;
+        height: 100%;
+        width: 100%;
+        border-radius: 0;
+        margin-right: 0;
+    }
+    .chatbot-popup .chat-header{
+        padding: 12px 15px;
+    }
+
+    .chat-body {
+        height: calc(90% - 55px);
+        padding: 25px 15px;
+    }
+
+    .chat-footer {
+        padding: 10px 15px 15px;
+    }
+
+    .chat-form .file-upload-wrapper.file-uploaded #file-cancel {
+        opacity: 0;
+    }
+}
